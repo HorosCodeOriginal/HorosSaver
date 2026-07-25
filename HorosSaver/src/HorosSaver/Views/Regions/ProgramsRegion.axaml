@@ -1,0 +1,610 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HorosSaver.ViewModels.Regions"
+             xmlns:items="using:HorosSaver.ViewModels"
+             xmlns:regions="using:HorosSaver.ViewModels.Regions"
+             xmlns:conv="using:HorosSaver.Converters"
+             xmlns:behaviors="using:HorosSaver.Behaviors"
+             x:Class="HorosSaver.Views.Regions.ProgramsRegion"
+             x:DataType="vm:ProgramsRegionViewModel"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="ProgramCardTemplate" x:DataType="items:ProgramProfileItemViewModel">
+            <Border Margin="0,0,8,8"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    Padding="7"
+                    Classes="program-card"
+                    Classes.program-card-selected="{Binding IsSelected}"
+                    BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                    BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}"
+                    PointerPressed="OnProgramPointerPressed">
+                <Border.ContextMenu>
+                    <ContextMenu Classes="horos-context-menu">
+                        <MenuItem Header="Snapshot speichern"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SaveProgramSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Dateien/Pfade bearbeiten"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).EditProfilePathsCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Installationsordner öffnen"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).OpenInstallFolderCommand}"
+                                  CommandParameter="{Binding .}"
+                                  IsVisible="{Binding HasInstallLocation}" />
+                        <Separator />
+                        <MenuItem Header="Nach oben"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).MoveProgramUpCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Nach unten"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).MoveProgramDownCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <Separator />
+                        <MenuItem Header="Profil löschen"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).DeleteProgramCommand}"
+                                  CommandParameter="{Binding .}" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <Grid ColumnDefinitions="3,*">
+                    <Border Grid.Column="0"
+                            Margin="0,0,4,0"
+                            CornerRadius="2"
+                            Background="{Binding SnapshotDisplayStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}" />
+                    <StackPanel Grid.Column="1" Spacing="3">
+                    <Grid>
+                    <StackPanel Spacing="3" IsEnabled="{Binding !HasActiveSnapshotJob}">
+                    <Button Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SelectProgramCommand}"
+                            CommandParameter="{Binding .}"
+                            DoubleTapped="OnProgramCardDoubleTapped"
+                            AutomationProperties.Name="{Binding Name, StringFormat='Programm {0} auswählen'}">
+                        <Button.ContextMenu>
+                            <ContextMenu Classes="horos-context-menu">
+                                <MenuItem Header="Snapshot speichern"
+                                          Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SaveProgramSnapshotCommand}"
+                                          CommandParameter="{Binding .}" />
+                                <MenuItem Header="Dateien/Pfade bearbeiten"
+                                          Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).EditProfilePathsCommand}"
+                                          CommandParameter="{Binding .}" />
+                                <MenuItem Header="Installationsordner öffnen"
+                                          Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).OpenInstallFolderCommand}"
+                                          CommandParameter="{Binding .}"
+                                          IsVisible="{Binding HasInstallLocation}" />
+                                <Separator />
+                                <MenuItem Header="Nach oben"
+                                          Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).MoveProgramUpCommand}"
+                                          CommandParameter="{Binding .}" />
+                                <MenuItem Header="Nach unten"
+                                          Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).MoveProgramDownCommand}"
+                                          CommandParameter="{Binding .}" />
+                                <Separator />
+                                <MenuItem Header="Profil löschen"
+                                          Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).DeleteProgramCommand}"
+                                          CommandParameter="{Binding .}" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                        <StackPanel Spacing="3">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Width="28"
+                                        Height="28"
+                                        CornerRadius="6"
+                                        Background="{Binding IconBackground, Converter={x:Static conv:StringToBrushConverter.Instance}}">
+                                    <TextBlock Text="{Binding IconGlyph}"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="8,0,6,0" Spacing="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding CategoryLabel}"
+                                               FontSize="10"
+                                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            Spacing="3"
+                                            VerticalAlignment="Top">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="3"
+                                                IsVisible="{Binding IsBound}">
+                                        <Ellipse Width="6"
+                                                 Height="6"
+                                                 Fill="{StaticResource HorosOrangeBrush}"
+                                                 VerticalAlignment="Center" />
+                                        <TextBlock Text="Eingebunden"
+                                                   FontSize="9"
+                                                   Foreground="{StaticResource HorosOrangeBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="3"
+                                                IsVisible="{Binding IsActive}">
+                                        <Ellipse Width="6"
+                                                 Height="6"
+                                                 Fill="{StaticResource HorosSuccessBrush}"
+                                                 VerticalAlignment="Center" />
+                                        <TextBlock Text="Aktiv"
+                                                   FontSize="9"
+                                                   Foreground="{StaticResource HorosTealBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding CompactDisplayDetails}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="items:ProfileDetailDisplayItem">
+                                        <DockPanel Margin="0,1" LastChildFill="True">
+                                            <Path DockPanel.Dock="Left"
+                                                  Width="10"
+                                                  Height="10"
+                                                  Stretch="Uniform"
+                                                  Stroke="{StaticResource HorosTextSecondaryBrush}"
+                                                  StrokeThickness="1.2"
+                                                  Data="{Binding IconKey, Converter={x:Static conv:DetailIconKeyToGeometryConverter.Instance}}" />
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       Text="{Binding Value}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource HorosTextPrimaryBrush}"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Margin="6,0,6,0"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding Label, StringFormat='{}{0}:'}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Ellipse Width="6"
+                                         Height="6"
+                                         Fill="{Binding SnapshotDisplayStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                         VerticalAlignment="Center" />
+                                <Path Width="10"
+                                      Height="10"
+                                      Stretch="Uniform"
+                                      Stroke="{Binding SnapshotDisplayStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                      StrokeThickness="1.2"
+                                      Data="{StaticResource IconClock}"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding LastSnapshotLabel}"
+                                           FontSize="9"
+                                           Foreground="{Binding SnapshotDisplayStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding SnapshotStatusTooltip}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="card-path-action"
+                            HorizontalAlignment="Left"
+                            Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).EditProfilePathsCommand}"
+                            CommandParameter="{Binding .}"
+                            AutomationProperties.Name="{Binding Name, StringFormat='Dateien hinzufügen für {0}'}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Path Data="{StaticResource IconGrid}"
+                                  Width="10"
+                                  Height="10"
+                                  Fill="{StaticResource HorosTealBrush}"
+                                  VerticalAlignment="Center" />
+                            <TextBlock Text="Dateien hinzufügen"
+                                       FontSize="10"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    </StackPanel>
+
+                    <Border Background="#CC0A0F14"
+                            CornerRadius="6"
+                            IsVisible="{Binding ShowSnapshotJobOverlay}">
+                        <StackPanel VerticalAlignment="Center"
+                                    Margin="10,6"
+                                    Spacing="6">
+                            <ProgressBar Minimum="0"
+                                         Maximum="100"
+                                         Value="{Binding SnapshotProgress}"
+                                         IsIndeterminate="{Binding ShowIndeterminateSnapshotProgress}"
+                                         Height="8"
+                                         Foreground="{StaticResource HorosTealBrush}" />
+                            <TextBlock Text="{Binding SnapshotProgressText}"
+                                       FontSize="10"
+                                       Foreground="{StaticResource HorosTealBrush}"
+                                       TextTrimming="CharacterEllipsis"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       MaxLines="2" />
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Spacing="4"
+                                        IsVisible="{Binding ShowSnapshotJobOverlay}">
+                                <Button Classes="card-path-action"
+                                        Padding="6,2"
+                                        Command="{Binding PauseSnapshotCommand}"
+                                        IsVisible="{Binding ShowPauseSnapshotButton}"
+                                        AutomationProperties.Name="Snapshot pausieren">
+                                    <TextBlock Text="Pause" FontSize="9" />
+                                </Button>
+                                <Button Classes="card-path-action"
+                                        Padding="6,2"
+                                        Command="{Binding ResumeSnapshotCommand}"
+                                        IsVisible="{Binding ShowResumeSnapshotButton}"
+                                        AutomationProperties.Name="Snapshot fortsetzen">
+                                    <TextBlock Text="Fortsetzen" FontSize="9" />
+                                </Button>
+                                <Button Classes="card-path-action"
+                                        Padding="6,2"
+                                        Command="{Binding CancelSnapshotCommand}"
+                                        AutomationProperties.Name="Snapshot abbrechen">
+                                    <TextBlock Text="Abbrechen" FontSize="9" />
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    </Grid>
+
+                    <Border Background="#401A1515"
+                            Padding="4,2"
+                            CornerRadius="4"
+                            IsVisible="{Binding HasSnapshotError}">
+                        <ScrollViewer MaxHeight="48"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding SnapshotErrorMessage}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource HorosOrangeBrush}"
+                                       TextWrapping="Wrap"
+                                       ToolTip.Tip="{Binding SnapshotErrorDetail}" />
+                        </ScrollViewer>
+                    </Border>
+                    <Border Background="#33FFB822"
+                            Padding="4,2"
+                            CornerRadius="4"
+                            IsVisible="{Binding HasSnapshotWarning}">
+                        <ScrollViewer MaxHeight="48"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding SnapshotWarningMessage}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource HorosOrangeBrush}"
+                                       TextWrapping="Wrap"
+                                       ToolTip.Tip="{Binding SnapshotWarningDetail}" />
+                        </ScrollViewer>
+                    </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ProgramGroupCardTemplate" x:DataType="items:ProgramGroupItemViewModel">
+            <Border Margin="0,0,8,8"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    Padding="7"
+                    Classes="program-card"
+                    Classes.program-card-selected="{Binding IsSelected}"
+                    BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                    BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}">
+                <Border.ContextMenu>
+                    <ContextMenu Classes="horos-context-menu">
+                        <MenuItem Header="Snapshot für Gruppe speichern"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SaveGroupSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="{Binding IsExpanded, Converter={x:Static conv:BoolToExpandLabelConverter.Instance}}"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).ToggleGroupExpandedCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <Separator />
+                        <MenuItem Header="Gruppe auflösen"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).DissolveGroupCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Gruppe inkl. Profile löschen"
+                                  Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).DeleteGroupWithProfilesCommand}"
+                                  CommandParameter="{Binding .}" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <StackPanel Spacing="4">
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                        <Button Grid.Column="0"
+                                Classes="card-path-action"
+                                Padding="4,2"
+                                Margin="0,0,6,0"
+                                Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).ToggleGroupExpandedCommand}"
+                                CommandParameter="{Binding .}"
+                                AutomationProperties.Name="Gruppe auf- oder zuklappen">
+                            <TextBlock Text="{Binding IsExpanded, Converter={x:Static conv:BoolToChevronConverter.Instance}}"
+                                       FontSize="11"
+                                       VerticalAlignment="Center" />
+                        </Button>
+                        <Border Grid.Column="1"
+                                Width="28"
+                                Height="28"
+                                CornerRadius="6"
+                                Background="{StaticResource HorosTealBrush}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="{Binding IconGlyph}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="#0A0F14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="2" Spacing="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DisplayTitle}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="Programm-Gruppe"
+                                       FontSize="10"
+                                       Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        </StackPanel>
+                        <Button Grid.Column="3"
+                                Classes="card-path-action"
+                                Padding="6,2"
+                                Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SaveGroupSnapshotCommand}"
+                                CommandParameter="{Binding .}"
+                                AutomationProperties.Name="{Binding DisplayTitle, StringFormat='Gruppe {0} sichern'}">
+                            <TextBlock Text="Gruppe sichern"
+                                       FontSize="10"
+                                       VerticalAlignment="Center" />
+                        </Button>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Ellipse Width="6"
+                                 Height="6"
+                                 Fill="{Binding SnapshotSummaryStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                 VerticalAlignment="Center" />
+                        <Path Width="10"
+                              Height="10"
+                              Stretch="Uniform"
+                              Stroke="{Binding SnapshotSummaryStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                              StrokeThickness="1.2"
+                              Data="{StaticResource IconClock}"
+                              VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding LastSnapshotSummary}"
+                                   FontSize="9"
+                                   Foreground="{Binding SnapshotSummaryStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip.Tip="{Binding SnapshotSummaryTooltip}" />
+                    </StackPanel>
+
+                    <ItemsControl ItemsSource="{Binding Members}"
+                                  IsVisible="{Binding IsExpanded}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="items:ProgramProfileItemViewModel">
+                                <Border Margin="0,2,0,0"
+                                        Padding="6,4"
+                                        CornerRadius="4"
+                                        Background="#1200D2B4"
+                                        PointerPressed="OnProgramPointerPressed">
+                                    <Border.ContextMenu>
+                                        <ContextMenu Classes="horos-context-menu">
+                                            <MenuItem Header="Snapshot speichern"
+                                                      Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SaveProgramSnapshotCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <MenuItem Header="Dateien/Pfade bearbeiten"
+                                                      Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).EditProfilePathsCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                            <Separator />
+                                            <MenuItem Header="Profil löschen"
+                                                      Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).DeleteProgramCommand}"
+                                                      CommandParameter="{Binding .}" />
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                    <StackPanel Spacing="2">
+                                    <Grid>
+                                        <Button Background="Transparent"
+                                                BorderThickness="0"
+                                                Padding="0"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
+                                                IsEnabled="{Binding !HasActiveSnapshotJob}"
+                                                Command="{Binding #Root.((regions:ProgramsRegionViewModel)DataContext).SelectProgramCommand}"
+                                                CommandParameter="{Binding .}"
+                                                DoubleTapped="OnProgramCardDoubleTapped"
+                                                AutomationProperties.Name="{Binding Name, StringFormat='Gruppenmitglied {0} auswählen'}">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="22"
+                                                        Height="22"
+                                                        CornerRadius="5"
+                                                        Background="{Binding IconBackground, Converter={x:Static conv:StringToBrushConverter.Instance}}">
+                                                    <TextBlock Text="{Binding IconGlyph}"
+                                                               FontSize="9"
+                                                               FontWeight="Bold"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="1">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               FontSize="11"
+                                                               FontWeight="SemiBold"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <Ellipse Width="5"
+                                                                 Height="5"
+                                                                 Fill="{Binding SnapshotDisplayStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                                                 VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding LastSnapshotLabel}"
+                                                                   FontSize="9"
+                                                                   Foreground="{Binding SnapshotDisplayStatus, Converter={x:Static conv:ProgramSnapshotDisplayStatusToBrushConverter.Instance}}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   ToolTip.Tip="{Binding SnapshotStatusTooltip}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+
+                                        <Border Background="#CC0A0F14"
+                                                CornerRadius="4"
+                                                IsVisible="{Binding ShowSnapshotJobOverlay}">
+                                            <StackPanel VerticalAlignment="Center"
+                                                        Margin="6,4"
+                                                        Spacing="4">
+                                                <ProgressBar Minimum="0"
+                                                             Maximum="100"
+                                                             Value="{Binding SnapshotProgress}"
+                                                             IsIndeterminate="{Binding ShowIndeterminateSnapshotProgress}"
+                                                             Height="6"
+                                                             Foreground="{StaticResource HorosTealBrush}" />
+                                                <TextBlock Text="{Binding SnapshotProgressText}"
+                                                           FontSize="9"
+                                                           Foreground="{StaticResource HorosTealBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextAlignment="Center"
+                                                           MaxLines="2"
+                                                           TextWrapping="Wrap" />
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Center"
+                                                            Spacing="3"
+                                                            IsVisible="{Binding ShowSnapshotJobOverlay}">
+                                                    <Button Classes="card-path-action"
+                                                            Padding="4,1"
+                                                            Command="{Binding PauseSnapshotCommand}"
+                                                            IsVisible="{Binding ShowPauseSnapshotButton}"
+                                                            AutomationProperties.Name="Snapshot pausieren">
+                                                        <TextBlock Text="Pause" FontSize="8" />
+                                                    </Button>
+                                                    <Button Classes="card-path-action"
+                                                            Padding="4,1"
+                                                            Command="{Binding ResumeSnapshotCommand}"
+                                                            IsVisible="{Binding ShowResumeSnapshotButton}"
+                                                            AutomationProperties.Name="Snapshot fortsetzen">
+                                                        <TextBlock Text="Fortsetzen" FontSize="8" />
+                                                    </Button>
+                                                    <Button Classes="card-path-action"
+                                                            Padding="4,1"
+                                                            Command="{Binding CancelSnapshotCommand}"
+                                                            AutomationProperties.Name="Snapshot abbrechen">
+                                                        <TextBlock Text="Abbrechen" FontSize="8" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+
+                                    <Border Background="#401A1515"
+                                            Padding="3,2"
+                                            CornerRadius="3"
+                                            IsVisible="{Binding HasSnapshotError}">
+                                        <ScrollViewer MaxHeight="40"
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Text="{Binding SnapshotErrorMessage}"
+                                                       FontSize="8"
+                                                       Foreground="{StaticResource HorosOrangeBrush}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding SnapshotErrorDetail}" />
+                                        </ScrollViewer>
+                                    </Border>
+                                    <Border Background="#33FFB822"
+                                            Padding="3,2"
+                                            CornerRadius="3"
+                                            IsVisible="{Binding HasSnapshotWarning}">
+                                        <ScrollViewer MaxHeight="40"
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Text="{Binding SnapshotWarningMessage}"
+                                                       FontSize="8"
+                                                       Foreground="{StaticResource HorosOrangeBrush}"
+                                                       TextWrapping="Wrap"
+                                                       ToolTip.Tip="{Binding SnapshotWarningDetail}" />
+                                        </ScrollViewer>
+                                    </Border>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource HorosBackgroundBrush}" Padding="16,12">
+        <Grid RowDefinitions="Auto,*">
+            <DockPanel Grid.Row="0" Margin="0,0,0,10" LastChildFill="False">
+                <Button DockPanel.Dock="Right"
+                        Classes="outline-action"
+                        Padding="8,4"
+                        Margin="8,0,0,0"
+                        Command="{Binding AutoCreateGroupsCommand}"
+                        AutomationProperties.Name="Gruppen automatisch erstellen">
+                    <TextBlock Text="Gruppen automatisch erstellen"
+                               FontSize="11"
+                               VerticalAlignment="Center" />
+                </Button>
+                <TextBlock Text="{Binding SectionTitle}"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+            </DockPanel>
+
+            <Panel Grid.Row="1">
+                <Border IsVisible="{Binding !HasVisiblePrograms}"
+                        Classes="program-card"
+                        BorderBrush="{StaticResource HorosBorderBrush}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        Padding="16">
+                    <StackPanel Spacing="6" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding EmptyStateTitle}"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding EmptyStateMessage}"
+                                   FontSize="11"
+                                   Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer x:Name="ProgramsScroll"
+                              IsVisible="{Binding HasVisiblePrograms}"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              behaviors:ScrollViewerWheelBehavior.EnableWheelOnHover="True">
+                    <ItemsControl ItemsSource="{Binding DisplayItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel>
+                                    <WrapPanel.ItemWidth>
+                                        <MultiBinding Converter="{x:Static conv:GridColumnsToItemWidthConverter.Instance}">
+                                            <Binding Path="Bounds.Width" ElementName="ProgramsScroll" />
+                                            <Binding Path="GridColumns" />
+                                        </MultiBinding>
+                                    </WrapPanel.ItemWidth>
+                                </WrapPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.DataTemplates>
+                            <DataTemplate DataType="items:ProgramGroupItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource ProgramGroupCardTemplate}" />
+                            </DataTemplate>
+                            <DataTemplate DataType="items:ProgramProfileItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource ProgramCardTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.DataTemplates>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Panel>
+        </Grid>
+    </Border>
+</UserControl>

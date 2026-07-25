@@ -1,0 +1,203 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:regions="using:HorosSaver.ViewModels.Regions"
+             xmlns:vm="using:HorosSaver.ViewModels"
+             xmlns:conv="using:HorosSaver.Converters"
+             xmlns:behaviors="using:HorosSaver.Behaviors"
+             x:Class="HorosSaver.Views.Regions.TimelineRegion"
+             x:DataType="regions:TimelineRegionViewModel"
+             x:Name="Root"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+    <Border Background="{StaticResource HorosBackgroundBrush}"
+            BorderBrush="{StaticResource HorosBorderBrush}"
+            BorderThickness="1,0,0,0"
+            Padding="12,12,12,14">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <DockPanel Grid.Row="0" Margin="0,0,0,8" LastChildFill="True">
+                <Button DockPanel.Dock="Right"
+                        Classes="outline-action"
+                        Margin="6,0,0,0"
+                        VerticalAlignment="Top"
+                        HorizontalContentAlignment="Center"
+                        Command="{Binding EditProfilePathsCommand}"
+                        IsVisible="{Binding HasProgramName}"
+                        AutomationProperties.Name="Pfade bearbeiten">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Path Data="{StaticResource IconSettings}"
+                              Width="12"
+                              Height="12"
+                              Stretch="Uniform"
+                              Stroke="{StaticResource HorosTealBrush}"
+                              StrokeThickness="1.5"
+                              VerticalAlignment="Center" />
+                        <TextBlock Text="Pfade bearbeiten"
+                                   FontSize="10"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" Spacing="0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ProgramName}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               TextTrimming="CharacterEllipsis"
+                               IsVisible="{Binding HasProgramName}" />
+                    <TextBlock FontSize="13" IsVisible="{Binding HasProgramName}">
+                        <Run Text=" — " Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        <Run Text="Zeitzustände" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    </TextBlock>
+                    <TextBlock Text="Zeitzustände"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               IsVisible="{Binding !HasProgramName}" />
+                </StackPanel>
+            </DockPanel>
+
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          behaviors:ScrollViewerWheelBehavior.EnableWheelOnHover="True">
+                <Panel>
+                    <TextBlock Text="{Binding EmptyMessage}"
+                               IsVisible="{Binding !HasSnapshots}"
+                               FontSize="11"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               TextWrapping="Wrap" />
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}"
+                                  IsVisible="{Binding HasSnapshots}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotItemViewModel">
+                                <Grid ColumnDefinitions="28,*" Margin="0,0,0,2">
+                                    <Grid Grid.Column="0" Width="28">
+                                        <Border Width="2"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Stretch"
+                                                Margin="0,22,0,0"
+                                                Background="{StaticResource HorosTealBrush}"
+                                                IsVisible="{Binding !IsLast}" />
+                                        <Border Classes="timeline-node"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Top"
+                                                Margin="0,1,0,0">
+                                            <TextBlock Text="{Binding Index}"
+                                                       FontSize="9"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource HorosTealBrush}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
+                                        <Ellipse Width="6"
+                                                 Height="6"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Top"
+                                                 Margin="0,8,0,0"
+                                                 Fill="{Binding IsCurrent, Converter={x:Static conv:BoolToTimelineStatusDotBrushConverter.Instance}}" />
+                                    </Grid>
+
+                                    <Button Grid.Column="1"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="0"
+                                            Margin="6,0,0,4"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
+                                            VerticalAlignment="Top"
+                                            VerticalContentAlignment="Top"
+                                            Command="{Binding #Root.((regions:TimelineRegionViewModel)DataContext).SelectSnapshotCommand}"
+                                            CommandParameter="{Binding .}"
+                                            PointerPressed="OnTimelinePointerPressed">
+                                        <Button.ContextMenu>
+                                            <ContextMenu Classes="horos-context-menu">
+                                                <MenuItem Header="Vergleichen"
+                                                          Command="{Binding #Root.((regions:TimelineRegionViewModel)DataContext).CompareSnapshotContextCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                                <MenuItem Header="Pfade bearbeiten"
+                                                          Command="{Binding #Root.((regions:TimelineRegionViewModel)DataContext).EditProfilePathsCommand}" />
+                                                <Separator />
+                                                <MenuItem Header="Im Explorer zeigen"
+                                                          Command="{Binding #Root.((regions:TimelineRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                                <MenuItem Header="Pfad kopieren"
+                                                          Command="{Binding #Root.((regions:TimelineRegionViewModel)DataContext).CopySnapshotPathCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <Border Classes="timeline-entry"
+                                                Classes.timeline-entry-selected="{Binding IsSelected}"
+                                                VerticalAlignment="Top">
+                                            <Grid RowDefinitions="Auto,Auto">
+                                                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               FontSize="11"
+                                                               FontWeight="SemiBold"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               VerticalAlignment="Center" />
+                                                    <Border Grid.Column="1"
+                                                            Classes="timeline-current-badge"
+                                                            IsVisible="{Binding IsCurrent}"
+                                                            VerticalAlignment="Center"
+                                                            Margin="6,0,0,0">
+                                                        <TextBlock Text="{Binding StatusLabel}"
+                                                                   FontSize="9"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="#0B1A2E" />
+                                                    </Border>
+                                                    <Path Grid.Column="1"
+                                                          Data="{StaticResource IconCalendar}"
+                                                          Width="12"
+                                                          Height="12"
+                                                          Stretch="Uniform"
+                                                          Stroke="{StaticResource HorosTextSecondaryBrush}"
+                                                          StrokeThickness="1.2"
+                                                          VerticalAlignment="Center"
+                                                          Margin="6,0,0,0"
+                                                          IsVisible="{Binding !IsCurrent}" />
+                                                </Grid>
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding MetadataLabel}"
+                                                           FontSize="10"
+                                                           Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           MaxLines="2"
+                                                           TextWrapping="Wrap"
+                                                           Margin="0,2,0,0" />
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Panel>
+            </ScrollViewer>
+
+            <ComboBox Grid.Row="2"
+                      ItemsSource="{Binding CompareOptions}"
+                      SelectedItem="{Binding CompareWithSnapshot}"
+                      IsVisible="False"
+                      HorizontalAlignment="Stretch" />
+
+            <Button Grid.Row="2"
+                    Classes="timeline-compare"
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding CompareSnapshotsCommand}"
+                    AutomationProperties.Name="Vergleichen">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Path Data="{StaticResource IconCompare}"
+                          Width="12"
+                          Height="12"
+                          Stretch="Uniform"
+                          Stroke="{StaticResource HorosTextPrimaryBrush}"
+                          StrokeThickness="1.5"
+                          VerticalAlignment="Center" />
+                    <TextBlock Text="Vergleichen"
+                               FontSize="11"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </Grid>
+    </Border>
+</UserControl>

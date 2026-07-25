@@ -1,0 +1,36 @@
+# Build
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# Artefakte & lokale Daten (KRITISCH — nie pushen)
+artifacts/
+**/artifacts/
+data/
+logs/
+*.log
+
+# Cursor / IDE
+.cursor/
+.idea/
+
+# Arbeitskopien / persönlich
+screenshots für md/
+Bilder der gui/
+zu saven
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+!*/*.csproj
+# Note: avoid ignoring legitimate source; do NOT use blanket *.key if it would break needed files — prefer:
+# rarreg.key and similar only appear under artifacts/ which is already ignored
+
+# OS
+Thumbs.db
+Desktop.ini
+*.tmp

@@ -1,0 +1,241 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="HorosSaver.App"
+             xmlns:local="using:HorosSaver"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://HorosSaver/Styles/HorosSaverTheme.axaml" />
+                <ResourceInclude Source="avares://HorosSaver/Styles/HorosSaverIcons.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{StaticResource HorosBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource HorosTextPrimaryBrush}" />
+            <Setter Property="FontFamily" Value="Inter, Segoe UI, sans-serif" />
+            <Setter Property="Icon" Value="/Assets/horossaver-icon.png" />
+            <Setter Property="WindowDecorations" Value="BorderOnly" />
+            <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+        </Style>
+
+        <Style Selector="Window[WindowDecorations=None]">
+            <Setter Property="ExtendClientAreaToDecorationsHint" Value="False" />
+        </Style>
+
+        <Style Selector="Window[ExtendClientAreaToDecorationsHint=True] /template/ Border#PART_TitleBar">
+            <Setter Property="Background" Value="{StaticResource HorosBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="Window[ExtendClientAreaToDecorationsHint=True] /template/ Border#PART_WindowBorder">
+            <Setter Property="Background" Value="{StaticResource HorosBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="Border.stat-chip">
+            <Setter Property="Background" Value="{StaticResource HorosSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinHeight" Value="32" />
+        </Style>
+
+        <Style Selector="Border.search-box">
+            <Setter Property="Background" Value="{StaticResource HorosSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Height" Value="36" />
+        </Style>
+
+        <Style Selector="Button.outline-action">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource HorosTealBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosTealBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="MinHeight" Value="36" />
+        </Style>
+
+        <Style Selector="Button.outline-action:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#16324A" />
+        </Style>
+
+        <Style Selector="Button.window-chrome-btn">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource HorosTextSecondaryBrush}" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+
+        <Style Selector="Button.window-chrome-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1E3A52" />
+        </Style>
+
+        <Style Selector="Button.window-chrome-btn.close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C42B1C" />
+        </Style>
+
+        <Style Selector="Button.window-chrome-btn.close:pointerover Path">
+            <Setter Property="Stroke" Value="White" />
+        </Style>
+
+        <Style Selector="GridSplitter.panel-splitter">
+            <Setter Property="Width" Value="6" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+
+        <Style Selector="GridSplitter.panel-splitter:pointerover">
+            <Setter Property="Background" Value="{StaticResource HorosBorderBrush}" />
+        </Style>
+
+        <Style Selector="Button.card-path-action">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource HorosTealBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="MinHeight" Value="20" />
+        </Style>
+
+        <Style Selector="Button.card-path-action:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <Style Selector="Button.card-path-action:pointerover">
+            <Setter Property="Foreground" Value="#33E0C8" />
+        </Style>
+
+        <Style Selector="Button.primary-action">
+            <Setter Property="Background" Value="{StaticResource HorosOrangeBrush}" />
+            <Setter Property="Foreground" Value="#1A1200" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="36" />
+        </Style>
+
+        <Style Selector="Button.nav-item">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="4,8" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+
+        <Style Selector="Button.nav-item.activeNav">
+            <Setter Property="Background" Value="{StaticResource HorosNavActiveBrush}" />
+        </Style>
+
+        <Style Selector="Button.nav-item:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#152A40" />
+        </Style>
+
+        <Style Selector="Button.nav-item.activeNav:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource HorosNavActiveBrush}" />
+        </Style>
+
+        <Style Selector="Border.program-card">
+            <Setter Property="Background" Value="{StaticResource HorosSurfaceBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10" />
+        </Style>
+
+        <Style Selector="Border.program-card.program-card-selected">
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <Style Selector="Border.timeline-entry">
+            <Setter Property="Background" Value="{StaticResource HorosPanelBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+
+        <Style Selector="Border.timeline-entry.timeline-entry-selected">
+            <Setter Property="Background" Value="{StaticResource HorosNavActiveBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosTealBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Border.timeline-node">
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="Background" Value="{StaticResource HorosBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosTealBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+
+        <Style Selector="Border.timeline-current-badge">
+            <Setter Property="Background" Value="{StaticResource HorosSuccessBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="6,2" />
+        </Style>
+
+        <Style Selector="Button.timeline-restore">
+            <Setter Property="Background" Value="{StaticResource HorosOrangeBrush}" />
+            <Setter Property="Foreground" Value="#1A1200" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.timeline-compare">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource HorosTextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="ContextMenu.horos-context-menu">
+            <Setter Property="Background" Value="{StaticResource HorosSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource HorosBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
+
+        <Style Selector="ContextMenu.horos-context-menu MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource HorosTextPrimaryBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+
+        <Style Selector="ContextMenu.horos-context-menu MenuItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource HorosNavActiveBrush}" />
+        </Style>
+    </Application.Styles>
+</Application>

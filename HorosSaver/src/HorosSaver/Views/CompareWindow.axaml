@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HorosSaver.ViewModels"
+        xmlns:conv="using:HorosSaver.Converters"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:behaviors="using:HorosSaver.Behaviors"
+        x:Class="HorosSaver.Views.CompareWindow"
+        x:DataType="vm:CompareViewModel"
+        Title="Snapshot-Vergleich"
+        Width="920"
+        Height="640"
+        MinWidth="720"
+        MinHeight="480"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource HorosBackgroundBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <regions:WindowChromeBar Grid.Row="0" />
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*,Auto" Margin="20">
+        <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,12">
+            <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding SummaryLabel}" FontSize="13" Foreground="{StaticResource HorosTealBrush}" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Classes="program-card"
+                BorderBrush="{StaticResource HorosBorderBrush}"
+                Margin="0,0,0,12"
+                Padding="14">
+            <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto,*">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="Älter (Basis)" FontSize="11" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        <TextBlock Text="{Binding OlderLabel}" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="↔" FontSize="18" VerticalAlignment="Center" Margin="16,0" />
+                    <StackPanel Grid.Column="2" Spacing="4">
+                        <TextBlock Text="Neuer (Ziel)" FontSize="11" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        <TextBlock Text="{Binding NewerLabel}" FontWeight="SemiBold" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock Text="{Binding RangeLabel}"
+                           FontSize="11"
+                           Foreground="{StaticResource HorosTextSecondaryBrush}" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2"
+                Background="{StaticResource HorosPanelBrush}"
+                BorderBrush="{StaticResource HorosBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12">
+            <Panel>
+                <TextBlock Text="{Binding EmptyMessage}"
+                           IsVisible="{Binding !HasDifferences}"
+                           Foreground="{StaticResource HorosTextSecondaryBrush}"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
+
+                <ScrollViewer IsVisible="{Binding HasDifferences}"
+                              behaviors:ScrollViewerWheelBehavior.EnableWheelOnHover="True">
+                    <ItemsControl ItemsSource="{Binding Differences}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotDiffItemViewModel">
+                                <Border Margin="0,0,0,8"
+                                        Padding="10"
+                                        CornerRadius="8"
+                                        Background="{StaticResource HorosSurfaceBrush}"
+                                        BorderBrush="{Binding Kind, Converter={x:Static conv:DiffKindToBrushConverter.Instance}}"
+                                        BorderThickness="1">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                        <Border Padding="8,4"
+                                                CornerRadius="8"
+                                                Background="{Binding Kind, Converter={x:Static conv:DiffKindToBrushConverter.Instance}}">
+                                            <TextBlock Text="{Binding StatusLabel}"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="{Binding RelativePath}"
+                                                       FontFamily="Consolas, Courier New"
+                                                       FontSize="12"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Detail}"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Spacing="2" MinWidth="120">
+                                            <TextBlock FontSize="10" Foreground="{StaticResource HorosTextSecondaryBrush}">
+                                                <Run Text="Alt: " />
+                                                <Run Text="{Binding OlderSizeLabel}" />
+                                            </TextBlock>
+                                            <TextBlock FontSize="10" Foreground="{StaticResource HorosTextSecondaryBrush}">
+                                                <Run Text="Neu: " />
+                                                <Run Text="{Binding NewerSizeLabel}" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Panel>
+        </Border>
+
+        <Button Grid.Row="3"
+                Classes="outline-action"
+                HorizontalAlignment="Right"
+                Margin="0,12,0,0"
+                Content="Schließen"
+                IsCancel="True"
+                IsDefault="True"
+                Command="{Binding CloseCommand}" />
+        </Grid>
+    </Grid>
+</Window>

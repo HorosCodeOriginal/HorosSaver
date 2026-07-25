@@ -1,0 +1,981 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HorosSaver.ViewModels"
+             xmlns:regions="using:HorosSaver.ViewModels.Regions"
+             xmlns:conv="using:HorosSaver.Converters"
+             xmlns:behaviors="using:HorosSaver.Behaviors"
+             x:Class="HorosSaver.Views.Regions.SnapshotsRegion"
+             x:DataType="regions:SnapshotsRegionViewModel"
+             x:Name="Root">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="SnapshotCardTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Grid Margin="0,0,8,8"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Top">
+                <Button Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Top"
+                        MaxHeight="160"
+                        Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).SelectSnapshotCommand}"
+                        CommandParameter="{Binding .}"
+                        PointerPressed="OnSnapshotPointerPressed"
+                        AutomationProperties.Name="{Binding Snapshot.Name}">
+                    <Button.ContextMenu>
+                        <ContextMenu Classes="horos-context-menu">
+                            <MenuItem Header="Wiederherstellen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Vergleichen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <Separator />
+                            <MenuItem Header="Im Explorer zeigen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Pfad kopieren"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CopySnapshotPathCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <Separator />
+                            <MenuItem Header="Umbenennen / Bearbeiten"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).EditSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <Separator />
+                            <MenuItem Header="Snapshot löschen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                    <Border Classes="program-card"
+                            BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                            BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}"
+                            Padding="7"
+                            VerticalAlignment="Top"
+                            MinHeight="124">
+                        <StackPanel Spacing="4">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <CheckBox Grid.Column="0"
+                                          Margin="0,0,6,0"
+                                          VerticalAlignment="Top"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          PointerPressed="OnCheckboxPointerPressed"
+                                          AutomationProperties.Name="Snapshot auswählen" />
+                                <StackPanel Grid.Column="1" Spacing="1">
+                                    <TextBlock Text="{Binding Snapshot.Name}"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Snapshot.Description}"
+                                               FontSize="10"
+                                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="1"
+                                               IsVisible="{Binding Snapshot.Description, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+                                    <TextBlock Text="{Binding Snapshot.MetadataLabel}"
+                                               FontSize="10"
+                                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="2"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Spacing="1">
+                                    <TextBlock Text="{Binding ProgramName}"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding ProgramCategory}"
+                                               FontSize="9"
+                                               Foreground="{StaticResource HorosTealBrush}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Spacing="1">
+                                    <TextBlock Text="{Binding Snapshot.SizeLabel}"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource HorosTealBrush}"
+                                               HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding Snapshot.FileCountLabel}"
+                                               FontSize="9"
+                                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                               HorizontalAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotCompactRowTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Border Margin="0,0,0,2"
+                    Padding="6,4"
+                    Classes="program-card"
+                    BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                    BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}">
+                <Border.ContextMenu>
+                    <ContextMenu Classes="horos-context-menu">
+                        <MenuItem Header="Wiederherstellen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Vergleichen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <Separator />
+                        <MenuItem Header="Im Explorer zeigen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Umbenennen / Bearbeiten"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).EditSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Snapshot löschen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <Grid ColumnDefinitions="Auto,2*,*,Auto,Auto,Auto">
+                    <CheckBox Grid.Column="0"
+                              Margin="0,0,8,0"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              PointerPressed="OnCheckboxPointerPressed" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Snapshot.Name}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding ProgramName}"
+                               FontSize="11"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding Snapshot.CreatedAt, Converter={x:Static conv:DateTimeOffsetToGermanLabelConverter.Instance}}"
+                               FontSize="10"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0" />
+                    <TextBlock Grid.Column="4"
+                               Text="{Binding Snapshot.SizeLabel}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HorosTealBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0" />
+                    <TextBlock Grid.Column="5"
+                               Text="{Binding Snapshot.FileCountLabel}"
+                               FontSize="10"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotTableRowTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Border Margin="0,0,0,1"
+                    Padding="6,4"
+                    Classes="program-card"
+                    BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                    BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}">
+                <Border.ContextMenu>
+                    <ContextMenu Classes="horos-context-menu">
+                        <MenuItem Header="Wiederherstellen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Vergleichen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <Separator />
+                        <MenuItem Header="Im Explorer zeigen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Pfad kopieren"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CopySnapshotPathCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Umbenennen / Bearbeiten"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).EditSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Snapshot löschen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <Grid ColumnDefinitions="Auto,2*,*,Auto,Auto,Auto">
+                    <CheckBox Grid.Column="0"
+                              Margin="0,0,8,0"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              PointerPressed="OnCheckboxPointerPressed" />
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Snapshot.Name}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="2"
+                               Text="{Binding ProgramName}"
+                               FontSize="11"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding Snapshot.CreatedAt, Converter={x:Static conv:DateTimeOffsetToGermanLabelConverter.Instance}}"
+                               FontSize="10"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0" />
+                    <TextBlock Grid.Column="4"
+                               Text="{Binding Snapshot.SizeLabel}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HorosTealBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0" />
+                    <TextBlock Grid.Column="5"
+                               Text="{Binding Snapshot.FileCountLabel}"
+                               FontSize="10"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotGalleryCardTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Grid Margin="0,0,10,10">
+                <Button Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Top"
+                        Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).SelectSnapshotCommand}"
+                        CommandParameter="{Binding .}"
+                        PointerPressed="OnSnapshotPointerPressed"
+                        AutomationProperties.Name="{Binding Snapshot.Name}">
+                    <Button.ContextMenu>
+                        <ContextMenu Classes="horos-context-menu">
+                            <MenuItem Header="Wiederherstellen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Vergleichen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <Separator />
+                            <MenuItem Header="Im Explorer zeigen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Umbenennen / Bearbeiten"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).EditSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Snapshot löschen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                    <Border Classes="program-card"
+                            BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                            BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}"
+                            Padding="12"
+                            VerticalAlignment="Top"
+                            MinHeight="168"
+                            MinWidth="220">
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <CheckBox Grid.Column="0"
+                                          Margin="0,0,8,0"
+                                          VerticalAlignment="Top"
+                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                          PointerPressed="OnCheckboxPointerPressed" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Text="{Binding Snapshot.Name}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Snapshot.Description}"
+                                               FontSize="11"
+                                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="2"
+                                               TextWrapping="Wrap"
+                                               IsVisible="{Binding Snapshot.Description, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+                                </StackPanel>
+                            </Grid>
+                            <Border Height="1" Background="{StaticResource HorosBorderBrush}" Opacity="0.6" />
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding ProgramName}"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding ProgramCategory}"
+                                           FontSize="10"
+                                           Foreground="{StaticResource HorosTealBrush}" />
+                                <TextBlock Text="{Binding Snapshot.CreatedAt, Converter={x:Static conv:DateTimeOffsetToGermanLabelConverter.Instance}}"
+                                           FontSize="11"
+                                           Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Snapshot.MetadataLabel}"
+                                               FontSize="10"
+                                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="2"
+                                               TextWrapping="Wrap" />
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="2">
+                                        <TextBlock Text="{Binding Snapshot.SizeLabel}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource HorosTealBrush}"
+                                                   HorizontalAlignment="Right" />
+                                        <TextBlock Text="{Binding Snapshot.FileCountLabel}"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                                   HorizontalAlignment="Right" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotCompactGridTileTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Grid Margin="0,0,4,4">
+                <Button Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        HorizontalAlignment="Stretch"
+                        Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).SelectSnapshotCommand}"
+                        CommandParameter="{Binding .}"
+                        PointerPressed="OnSnapshotPointerPressed"
+                        AutomationProperties.Name="{Binding Snapshot.Name}">
+                    <Button.ContextMenu>
+                        <ContextMenu Classes="horos-context-menu">
+                            <MenuItem Header="Wiederherstellen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Vergleichen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Im Explorer zeigen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Snapshot löschen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                    <Border Classes="program-card"
+                            BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                            BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}"
+                            Padding="5"
+                            MinHeight="72"
+                            MinWidth="88">
+                        <StackPanel Spacing="2">
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      PointerPressed="OnCheckboxPointerPressed"
+                                      Margin="0,0,0,2" />
+                            <TextBlock Text="{Binding Snapshot.Name}"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxLines="2"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Snapshot.SizeLabel}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource HorosTealBrush}" />
+                        </StackPanel>
+                    </Border>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotChronologyRowTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Grid Margin="0,0,0,4" ColumnDefinitions="28,*">
+                <StackPanel Grid.Column="0" HorizontalAlignment="Center" Spacing="0">
+                    <Ellipse Width="10"
+                             Height="10"
+                             Fill="{Binding IsSelected, Converter={x:Static conv:BoolToTimelineNodeBrushConverter.Instance}}"
+                             Stroke="{StaticResource HorosTealBrush}"
+                             StrokeThickness="1.5"
+                             Margin="0,8,0,0" />
+                    <Border Width="2"
+                            Background="{StaticResource HorosBorderBrush}"
+                            HorizontalAlignment="Center"
+                            MinHeight="24" />
+                </StackPanel>
+                <Border Grid.Column="1"
+                        Margin="0,0,0,4"
+                        Padding="8,6"
+                        Classes="program-card"
+                        BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                        BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}">
+                    <Border.ContextMenu>
+                        <ContextMenu Classes="horos-context-menu">
+                            <MenuItem Header="Wiederherstellen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Vergleichen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Im Explorer zeigen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Umbenennen / Bearbeiten"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).EditSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                            <MenuItem Header="Snapshot löschen"
+                                      Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                      CommandParameter="{Binding .}" />
+                        </ContextMenu>
+                    </Border.ContextMenu>
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <CheckBox Grid.Column="0"
+                                  Margin="0,0,8,0"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                  PointerPressed="OnCheckboxPointerPressed" />
+                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Snapshot.Name}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock FontSize="10"
+                                       Foreground="{StaticResource HorosTextSecondaryBrush}">
+                                <Run Text="{Binding ProgramName}" />
+                                <Run Text=" · " />
+                                <Run Text="{Binding Snapshot.CreatedAt, Converter={x:Static conv:DateTimeOffsetToGermanLabelConverter.Instance}}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Spacing="1"
+                                    Margin="8,0,0,0">
+                            <TextBlock Text="{Binding Snapshot.SizeLabel}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource HorosTealBrush}"
+                                       HorizontalAlignment="Right" />
+                            <TextBlock Text="{Binding Snapshot.FileCountLabel}"
+                                       FontSize="9"
+                                       Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                       HorizontalAlignment="Right" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotTreeRowTemplate" x:DataType="vm:SnapshotOverviewItemViewModel">
+            <Border Margin="28,0,0,1"
+                    Padding="6,3"
+                    Classes="program-card"
+                    BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                    BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}">
+                <Border.ContextMenu>
+                    <ContextMenu Classes="horos-context-menu">
+                        <MenuItem Header="Wiederherstellen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Vergleichen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).CompareSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Im Explorer zeigen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).OpenSnapshotInExplorerCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Umbenennen / Bearbeiten"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).EditSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="Snapshot löschen"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).DeleteSnapshotCommand}"
+                                  CommandParameter="{Binding .}" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                    <TextBlock Grid.Column="0"
+                               Text="└"
+                               FontSize="11"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,6,0" />
+                    <CheckBox Grid.Column="1"
+                              Margin="0,0,8,0"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              PointerPressed="OnCheckboxPointerPressed" />
+                    <TextBlock Grid.Column="2"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               TextTrimming="CharacterEllipsis">
+                        <Run Text="{Binding Snapshot.Name}" FontWeight="SemiBold" />
+                        <Run Text=" — " Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        <Run Text="{Binding ProgramName}" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    </TextBlock>
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding Snapshot.CreatedAt, Converter={x:Static conv:DateTimeOffsetToGermanLabelConverter.Instance}}"
+                               FontSize="9"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0" />
+                    <TextBlock Grid.Column="4"
+                               Text="{Binding Snapshot.SizeLabel}"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HorosTealBrush}"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SnapshotGroupTemplate" x:DataType="vm:SnapshotDisplayGroupViewModel">
+            <Border Margin="0,0,0,12"
+                    Padding="10,8"
+                    Classes="program-card"
+                    BorderBrush="{StaticResource HorosBorderBrush}"
+                    HorizontalAlignment="Stretch">
+                <Border.ContextMenu>
+                    <ContextMenu Classes="horos-context-menu">
+                        <MenuItem Header="Gruppe wiederherstellen (alle)"
+                                  IsVisible="{Binding IsProgramGroup}"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).RestoreGroupSnapshotsCommand}"
+                                  CommandParameter="{Binding .}" />
+                        <MenuItem Header="{Binding IsExpanded, Converter={x:Static conv:BoolToExpandLabelConverter.Instance}}"
+                                  Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).ToggleGroupExpandedCommand}"
+                                  CommandParameter="{Binding .}" />
+                    </ContextMenu>
+                </Border.ContextMenu>
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto"
+                          IsVisible="{Binding ShowHeader}">
+                        <Button Grid.Column="0"
+                                Classes="card-path-action"
+                                Padding="4,2"
+                                Margin="0,0,6,0"
+                                Command="{Binding #Root.((regions:SnapshotsRegionViewModel)DataContext).ToggleGroupExpandedCommand}"
+                                CommandParameter="{Binding .}"
+                                AutomationProperties.Name="Snapshot-Gruppe auf- oder zuklappen">
+                            <TextBlock Text="{Binding IsExpanded, Converter={x:Static conv:BoolToChevronConverter.Instance}}"
+                                       FontSize="11"
+                                       VerticalAlignment="Center" />
+                        </Button>
+                        <Border Grid.Column="1"
+                                Width="28"
+                                Height="28"
+                                CornerRadius="6"
+                                Background="{StaticResource HorosTealBrush}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="{Binding IconGlyph}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="#0A0F14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="2" Spacing="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DisplayTitle}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding StatsSubtitle}"
+                                       FontSize="10"
+                                       Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="3"
+                                   Text="{Binding TotalSizeLabel}"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource HorosTealBrush}"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+
+                    <TextBlock Text="Keine Snapshots in dieser Gruppe."
+                               FontSize="11"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               IsVisible="{Binding !Snapshots.Count}" />
+
+                    <Grid ColumnDefinitions="Auto,2*,*,Auto,Auto,Auto"
+                          Margin="6,2,0,6">
+                        <Grid.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsTableView" />
+                            </MultiBinding>
+                        </Grid.IsVisible>
+                        <TextBlock Grid.Column="1" Text="Name" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        <TextBlock Grid.Column="2" Text="Programm" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        <TextBlock Grid.Column="3" Text="Datum" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource HorosTextSecondaryBrush}" Margin="8,0" />
+                        <TextBlock Grid.Column="4" Text="Größe" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource HorosTextSecondaryBrush}" Margin="8,0" />
+                        <TextBlock Grid.Column="5" Text="Dateien" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource HorosTextSecondaryBrush}" Margin="8,0,0,0" />
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsCompactListView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotCompactRowTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsTableView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotTableRowTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsChronologyView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotChronologyRowTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsTreeView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotTreeRowTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsCardsView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal">
+                                    <WrapPanel.ItemWidth>
+                                        <MultiBinding Converter="{x:Static conv:GridColumnsToItemWidthConverter.Instance}">
+                                            <Binding Path="Bounds.Width"
+                                                     RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                            <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).GridColumns" />
+                                        </MultiBinding>
+                                    </WrapPanel.ItemWidth>
+                                </WrapPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotCardTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsGalleryView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal">
+                                    <WrapPanel.ItemWidth>
+                                        <MultiBinding Converter="{x:Static conv:GridColumnsToItemWidthConverter.Instance}">
+                                            <Binding Path="Bounds.Width"
+                                                     RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                            <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).GridColumns" />
+                                        </MultiBinding>
+                                    </WrapPanel.ItemWidth>
+                                </WrapPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotGalleryCardTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <ItemsControl ItemsSource="{Binding Snapshots}">
+                        <ItemsControl.IsVisible>
+                            <MultiBinding Converter="{x:Static conv:BoolAndConverter.Instance}">
+                                <Binding Path="IsExpanded" />
+                                <Binding Path="#Root.((regions:SnapshotsRegionViewModel)DataContext).IsCompactGridView" />
+                            </MultiBinding>
+                        </ItemsControl.IsVisible>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal">
+                                    <WrapPanel.ItemWidth>
+                                        <MultiBinding Converter="{x:Static conv:GridColumnsToItemWidthConverter.Instance}"
+                                                      ConverterParameter="5">
+                                            <Binding Path="Bounds.Width"
+                                                     RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                        </MultiBinding>
+                                    </WrapPanel.ItemWidth>
+                                </WrapPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SnapshotOverviewItemViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotCompactGridTileTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource HorosBackgroundBrush}" Padding="20,16">
+        <Grid RowDefinitions="Auto,Auto,Auto,*">
+            <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,10">
+                <TextBlock Text="{Binding SectionTitle}"
+                           FontSize="16"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="{Binding SectionSubtitle}"
+                           FontSize="12"
+                           Foreground="{StaticResource HorosTextSecondaryBrush}"
+                           TextWrapping="Wrap" />
+                <TextBlock Text="{Binding StatsLine}"
+                           FontSize="11"
+                           Foreground="{StaticResource HorosTealBrush}"
+                           Margin="0,2,0,0" />
+            </StackPanel>
+
+            <Border Grid.Row="1"
+                    Classes="program-card"
+                    BorderBrush="{StaticResource HorosBorderBrush}"
+                    Padding="10,8"
+                    Margin="0,0,0,8">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Ansichtsoptionen"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    <WrapPanel Orientation="Horizontal">
+                        <StackPanel Margin="0,0,12,6" Spacing="4" MinWidth="140">
+                            <TextBlock Text="Ansicht" FontSize="10" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                            <ComboBox ItemsSource="{Binding ViewLayoutOptions}"
+                                      SelectedItem="{Binding SelectedViewLayoutOption}"
+                                      HorizontalAlignment="Stretch"
+                                      MinWidth="140">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Label}" FontSize="11" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,12,6" Spacing="4" MinWidth="170">
+                            <TextBlock Text="Gruppierung" FontSize="10" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                            <ComboBox ItemsSource="{Binding GroupModeOptions}"
+                                      SelectedItem="{Binding SelectedGroupModeOption}"
+                                      HorizontalAlignment="Stretch"
+                                      MinWidth="170">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Label}" FontSize="11" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,12,6" Spacing="4" MinWidth="150">
+                            <TextBlock Text="Sortierung" FontSize="10" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                            <ComboBox ItemsSource="{Binding SortModeOptions}"
+                                      SelectedItem="{Binding SelectedSortModeOption}"
+                                      HorizontalAlignment="Stretch"
+                                      MinWidth="150">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Label}" FontSize="11" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,12,6" Spacing="4" MinWidth="140">
+                            <TextBlock Text="Zeitraum" FontSize="10" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                            <ComboBox ItemsSource="{Binding DateRangeOptions}"
+                                      SelectedItem="{Binding SelectedDateRangeOption}"
+                                      HorizontalAlignment="Stretch"
+                                      MinWidth="140">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Label}" FontSize="11" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <CheckBox Content="Nur mit Snapshots"
+                                  IsChecked="{Binding OnlyWithSnapshots}"
+                                  VerticalAlignment="Bottom"
+                                  Margin="0,0,0,6"
+                                  FontSize="11" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Classes="program-card"
+                    BorderBrush="{StaticResource HorosBorderBrush}"
+                    Padding="10,8"
+                    Margin="0,0,0,8"
+                    IsVisible="{Binding HasSelection}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0"
+                               VerticalAlignment="Center"
+                               FontSize="12">
+                        <Run Text="{Binding SelectedCount}" FontWeight="SemiBold" />
+                        <Run Text=" ausgewählt" />
+                    </TextBlock>
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="6">
+                        <Button Classes="outline-action"
+                                Content="Auswahl wiederherstellen"
+                                FontSize="11"
+                                Command="{Binding RestoreSelectedCommand}" />
+                        <Button Classes="outline-action"
+                                Content="Auswahl löschen"
+                                FontSize="11"
+                                Command="{Binding DeleteSelectedCommand}" />
+                        <Button Classes="card-path-action"
+                                Content="Aufheben"
+                                FontSize="11"
+                                Command="{Binding ClearSelectionCommand}" />
+                        <Button Classes="card-path-action"
+                                Content="Alle sichtbaren"
+                                FontSize="11"
+                                Command="{Binding SelectAllVisibleCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Panel Grid.Row="3">
+                <Border IsVisible="{Binding !HasSnapshots}"
+                        Classes="program-card"
+                        BorderBrush="{StaticResource HorosBorderBrush}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        Padding="24">
+                    <StackPanel Spacing="8" HorizontalAlignment="Center">
+                        <TextBlock Text="Noch keine Snapshots"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding EmptyMessage}"
+                                   FontSize="13"
+                                   Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <Border IsVisible="{Binding ShowFilterEmpty}"
+                        Classes="program-card"
+                        BorderBrush="{StaticResource HorosBorderBrush}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        Padding="24">
+                    <StackPanel Spacing="8" HorizontalAlignment="Center">
+                        <TextBlock Text="Keine Treffer"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding EmptyFilterMessage}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   HorizontalAlignment="Center"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer x:Name="SnapshotsScroll"
+                              IsVisible="{Binding HasVisibleSnapshots}"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              behaviors:ScrollViewerWheelBehavior.EnableWheelOnHover="True">
+                    <ItemsControl ItemsSource="{Binding DisplayGroups}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Spacing="0" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:SnapshotDisplayGroupViewModel">
+                                <ContentControl Content="{Binding}"
+                                                ContentTemplate="{StaticResource SnapshotGroupTemplate}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Panel>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HorosSaver.ViewModels"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:behaviors="using:HorosSaver.Behaviors"
+        x:Class="HorosSaver.Views.EditSnapshotWindow"
+        x:DataType="vm:EditSnapshotViewModel"
+        Title="Snapshot bearbeiten"
+        Width="560"
+        SizeToContent="Height"
+        MinHeight="260"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource HorosBackgroundBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <regions:WindowChromeBar Grid.Row="0"
+                                   ShowMinimizeButton="False"
+                                   ShowMaximizeButton="False" />
+
+        <Border Grid.Row="1" Padding="20" BorderBrush="{StaticResource HorosBorderBrush}" BorderThickness="0,0,0,0">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,16">
+                <TextBlock Text="Snapshot bearbeiten" FontSize="18" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontSize="12"
+                           Foreground="{StaticResource HorosTextSecondaryBrush}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="12">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Anzeigename" FontSize="12" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    <TextBox Text="{Binding DisplayName}"
+                             FontSize="13"
+                             behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True" />
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Aktueller Speicherort" FontSize="12" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    <TextBlock Text="{Binding StoragePathLabel}"
+                               FontSize="11"
+                               Foreground="{StaticResource HorosTealBrush}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Neuer Speicherort (optional verschieben)" FontSize="12" Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding StorageRoot}"
+                                 PlaceholderText="Leer lassen = nicht verschieben"
+                                 FontSize="12"
+                                 behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True" />
+                        <Button Grid.Column="1"
+                                Classes="outline-action"
+                                Content="Durchsuchen…"
+                                Command="{Binding BrowseStorageRootCommand}" />
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        Margin="0,16,0,0">
+                <Button Classes="outline-action"
+                        Content="Abbrechen"
+                        IsCancel="True"
+                        Command="{Binding CancelCommand}" />
+                <Button Classes="primary-action"
+                        Content="Speichern"
+                        IsDefault="True"
+                        Command="{Binding ConfirmCommand}" />
+            </StackPanel>
+        </Grid>
+        </Border>
+    </Grid>
+</Window>

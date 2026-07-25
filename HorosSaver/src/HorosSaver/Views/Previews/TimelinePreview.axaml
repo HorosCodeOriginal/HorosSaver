@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:vm="using:HorosSaver.ViewModels.Previews"
+        x:Class="HorosSaver.Views.Previews.TimelinePreview"
+        x:DataType="vm:TimelinePreviewViewModel"
+        Title="Preview: Timeline"
+        Width="360"
+        Height="760"
+        WindowDecorations="None"
+        CanResize="False"
+        Background="{StaticResource HorosBackgroundBrush}">
+    <Grid Width="360" Height="760">
+        <regions:TimelineRegion x:Name="TimelineRegion"
+                                DataContext="{Binding}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch" />
+    </Grid>
+</Window>

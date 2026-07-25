@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Color x:Key="HorosBackgroundColor">#0B1A2E</Color>
+    <Color x:Key="HorosSurfaceColor">#12243D</Color>
+    <Color x:Key="HorosTealColor">#00D2B4</Color>
+    <Color x:Key="HorosOrangeColor">#FFB822</Color>
+    <Color x:Key="HorosTextPrimaryColor">#F4F7FB</Color>
+    <Color x:Key="HorosTextSecondaryColor">#A8B8CC</Color>
+    <Color x:Key="HorosBorderColor">#1E3A52</Color>
+    <Color x:Key="HorosPanelColor">#0E1F35</Color>
+    <Color x:Key="HorosSuccessColor">#4ADE80</Color>
+    <Color x:Key="HorosSnapshotOutdatedColor">#C48B6A</Color>
+    <Color x:Key="HorosSnapshotPartialColor">#E6A23C</Color>
+    <Color x:Key="HorosNavActiveColor">#16324A</Color>
+
+    <SolidColorBrush x:Key="HorosBackgroundBrush" Color="{StaticResource HorosBackgroundColor}" />
+    <SolidColorBrush x:Key="HorosSurfaceBrush" Color="{StaticResource HorosSurfaceColor}" />
+    <SolidColorBrush x:Key="HorosTealBrush" Color="{StaticResource HorosTealColor}" />
+    <SolidColorBrush x:Key="HorosOrangeBrush" Color="{StaticResource HorosOrangeColor}" />
+    <SolidColorBrush x:Key="HorosTextPrimaryBrush" Color="{StaticResource HorosTextPrimaryColor}" />
+    <SolidColorBrush x:Key="HorosTextSecondaryBrush" Color="{StaticResource HorosTextSecondaryColor}" />
+    <SolidColorBrush x:Key="HorosBorderBrush" Color="{StaticResource HorosBorderColor}" />
+    <SolidColorBrush x:Key="HorosPanelBrush" Color="{StaticResource HorosPanelColor}" />
+    <SolidColorBrush x:Key="HorosSuccessBrush" Color="{StaticResource HorosSuccessColor}" />
+    <SolidColorBrush x:Key="HorosSnapshotOutdatedBrush" Color="{StaticResource HorosSnapshotOutdatedColor}" />
+    <SolidColorBrush x:Key="HorosSnapshotPartialBrush" Color="{StaticResource HorosSnapshotPartialColor}" />
+    <SolidColorBrush x:Key="HorosNavActiveBrush" Color="{StaticResource HorosNavActiveColor}" />
+
+</ResourceDictionary>

@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        x:Class="HorosSaver.Views.Previews.WindowChromePreview"
+        Title="HorosSaver — by HorosCode"
+        Width="1280"
+        Height="32"
+        WindowDecorations="None"
+        CanResize="False"
+        Background="{StaticResource HorosBackgroundBrush}">
+    <Grid Width="1280" Height="32">
+        <regions:WindowChromeBar x:Name="ChromeBar"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch" />
+    </Grid>
+</Window>

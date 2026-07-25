@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HorosSaver.ViewModels"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:behaviors="using:HorosSaver.Behaviors"
+        x:Class="HorosSaver.Views.SnapshotCaptureTargetWindow"
+        x:DataType="vm:SnapshotCaptureTargetViewModel"
+        Title="Snapshot-Zielort"
+        Width="560"
+        SizeToContent="Height"
+        MinHeight="280"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource HorosBackgroundBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <regions:WindowChromeBar Grid.Row="0"
+                                   ShowMinimizeButton="False"
+                                   ShowMaximizeButton="False" />
+
+        <Border Grid.Row="1" Padding="20" BorderBrush="{StaticResource HorosBorderBrush}" BorderThickness="0,0,0,0">
+        <Grid RowDefinitions="Auto,*,Auto">
+            <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,16">
+                <TextBlock Text="Snapshot-Zielort" FontSize="18" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontSize="12"
+                           Foreground="{StaticResource HorosTextSecondaryBrush}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="10">
+                <RadioButton GroupName="CaptureTarget"
+                             IsChecked="{Binding IsStandardInternalMode}"
+                             Command="{Binding SetModeCommand}"
+                             CommandParameter="StandardInternal">
+                    <TextBlock Text="{Binding StandardInternalLabel}" TextWrapping="Wrap" />
+                </RadioButton>
+
+                <RadioButton GroupName="CaptureTarget"
+                             IsEnabled="{Binding HasProfileDefault}"
+                             IsChecked="{Binding IsProfileDefaultMode}"
+                             Command="{Binding SetModeCommand}"
+                             CommandParameter="ProfileDefault">
+                    <TextBlock Text="{Binding ProfileDefaultLabel}" TextWrapping="Wrap" />
+                </RadioButton>
+
+                <StackPanel Spacing="6">
+                    <RadioButton GroupName="CaptureTarget"
+                                 IsChecked="{Binding IsCustomFolderMode}"
+                                 Command="{Binding SetModeCommand}"
+                                 CommandParameter="CustomFolder"
+                                 Content="Anderer Ordner" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding CustomFolderPath}"
+                                 PlaceholderText="Pfad zum Zielordner"
+                                 FontSize="12"
+                                 behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True" />
+                        <Button Grid.Column="1"
+                                Classes="outline-action"
+                                Content="Durchsuchen…"
+                                Command="{Binding BrowseCustomFolderCommand}" />
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8"
+                        Margin="0,16,0,0">
+                <Button Classes="outline-action"
+                        Content="Abbrechen"
+                        IsCancel="True"
+                        Command="{Binding CancelCommand}" />
+                <Button Classes="primary-action"
+                        Content="Snapshot erstellen"
+                        IsDefault="True"
+                        Command="{Binding ConfirmCommand}" />
+            </StackPanel>
+        </Grid>
+        </Border>
+    </Grid>
+</Window>

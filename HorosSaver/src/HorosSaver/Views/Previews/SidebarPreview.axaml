@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:vm="using:HorosSaver.ViewModels.Previews"
+        x:Class="HorosSaver.Views.Previews.SidebarPreview"
+        x:DataType="vm:SidebarPreviewViewModel"
+        Title="Preview: Sidebar"
+        Width="240"
+        Height="720"
+        WindowDecorations="None"
+        CanResize="False"
+        Background="{StaticResource HorosBackgroundBrush}">
+    <Grid Width="240" Height="720">
+        <regions:SidebarRegion x:Name="SidebarRegion"
+                               DataContext="{Binding}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch" />
+    </Grid>
+</Window>

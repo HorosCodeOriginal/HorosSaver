@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HorosSaver.ViewModels"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        x:Class="HorosSaver.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="HorosSaver — by HorosCode"
+        Icon="/Assets/horossaver-icon.png"
+        Width="1280"
+        Height="800"
+        MinWidth="1024"
+        MinHeight="680"
+        WindowState="Maximized"
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaToDecorationsHint="True"
+        Background="{StaticResource HorosBackgroundBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <regions:WindowChromeBar Grid.Row="0" />
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <regions:SidebarRegion Grid.Column="0"
+                                   DataContext="{Binding Sidebar}"
+                                   VerticalAlignment="Stretch" />
+
+            <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto">
+                <regions:ToolbarRegion Grid.Row="0" DataContext="{Binding Toolbar}" />
+
+                <Panel Grid.Row="1">
+                    <Grid x:Name="ProgrammeSplitGrid"
+                          IsVisible="{Binding IsProgrammeView}"
+                          ColumnDefinitions="*,6,*">
+                        <regions:ProgramsRegion x:Name="ProgrammeProgramsRegion"
+                                                Grid.Column="0"
+                                                MinWidth="280"
+                                                DataContext="{Binding Programs}" />
+                        <GridSplitter x:Name="ProgrammeSplitter"
+                                      Grid.Column="1"
+                                      Classes="panel-splitter"
+                                      ResizeDirection="Columns"
+                                      DragCompleted="OnDetailPanelSplitterDragCompleted" />
+                        <regions:TimelineRegion x:Name="ProgrammeTimelineRegion"
+                                                Grid.Column="2"
+                                                MinWidth="240"
+                                                DataContext="{Binding Timeline}" />
+                    </Grid>
+
+                    <Panel IsVisible="{Binding IsSnapshotsView}">
+                        <regions:SnapshotsRegion DataContext="{Binding Snapshots}" />
+                    </Panel>
+
+                    <Grid x:Name="TimelineSplitGrid"
+                          IsVisible="{Binding IsTimelineView}"
+                          ColumnDefinitions="300,6,*">
+                        <regions:ProgramsRegion Grid.Column="0"
+                                                MinWidth="220"
+                                                MaxWidth="480"
+                                                DataContext="{Binding Programs}" />
+                        <GridSplitter Grid.Column="1"
+                                      Classes="panel-splitter"
+                                      ResizeDirection="Columns" />
+                        <regions:TimelineRegion Grid.Column="2"
+                                                MinWidth="280"
+                                                DataContext="{Binding Timeline}" />
+                    </Grid>
+
+                    <Panel IsVisible="{Binding IsRestoreWizardView}">
+                        <regions:RestoreWizardRegion DataContext="{Binding RestoreWizard}" />
+                    </Panel>
+
+                    <Panel IsVisible="{Binding IsSettingsView}">
+                        <regions:SettingsRegion DataContext="{Binding Settings}" />
+                    </Panel>
+                </Panel>
+
+                <regions:StatusBarRegion Grid.Row="2" DataContext="{Binding StatusBar}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

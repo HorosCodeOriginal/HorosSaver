@@ -1,0 +1,274 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HorosSaver.ViewModels.Regions"
+             xmlns:previews="using:HorosSaver.Views.Previews"
+             xmlns:behaviors="using:HorosSaver.Behaviors"
+             x:Class="HorosSaver.Views.Regions.ToolbarRegion"
+             x:DataType="vm:ToolbarRegionViewModel"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Top">
+
+    <Design.PreviewWith>
+        <previews:ToolbarPreview />
+    </Design.PreviewWith>
+
+    <Border Background="{StaticResource HorosBackgroundBrush}"
+            BorderBrush="{StaticResource HorosBorderBrush}"
+            BorderThickness="0,0,0,1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Grid>
+            <!-- Collapsed: schmale Leiste mit Chevron + Hinweis -->
+            <DockPanel IsVisible="{Binding !IsToolbarExpanded}"
+                       Margin="20,6,20,6"
+                       VerticalAlignment="Center"
+                       MinHeight="32">
+                <Button DockPanel.Dock="Left"
+                        Classes="card-path-action"
+                        Command="{Binding ToggleToolbarCommand}"
+                        ToolTip.Tip="{Binding ToolbarExpandTooltip}"
+                        Padding="6,4"
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="{Binding ToolbarExpandTooltip}">
+                    <TextBlock Text="{Binding ToolbarChevron}"
+                               FontSize="11"
+                               VerticalAlignment="Center" />
+                </Button>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="6"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Toolbar"
+                               FontSize="12"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="·"
+                               FontSize="12"
+                               Foreground="{StaticResource HorosTextSecondaryBrush}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding BreadcrumbPrimary}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HorosTealBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Expanded: volle Toolbar -->
+            <Border IsVisible="{Binding IsToolbarExpanded}"
+                    Padding="20,16,20,14">
+                <Border.Transitions>
+                    <Transitions>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+                    </Transitions>
+                </Border.Transitions>
+
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="12">
+                    <!-- Row 1: breadcrumb (left) + primary actions (right) -->
+                    <DockPanel Grid.Row="0" LastChildFill="True">
+                        <Button DockPanel.Dock="Right"
+                                Classes="card-path-action"
+                                Command="{Binding ToggleToolbarCommand}"
+                                ToolTip.Tip="{Binding ToolbarExpandTooltip}"
+                                Padding="6,4"
+                                Margin="8,0,0,6"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="{Binding ToolbarExpandTooltip}">
+                            <TextBlock Text="{Binding ToolbarChevron}"
+                                       FontSize="11"
+                                       VerticalAlignment="Center" />
+                        </Button>
+
+                        <WrapPanel DockPanel.Dock="Right"
+                                   Orientation="Horizontal"
+                                   VerticalAlignment="Center"
+                                   MaxWidth="980">
+                            <Border Classes="search-box"
+                                    MinWidth="180"
+                                    MaxWidth="240"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center">
+                                <Grid ColumnDefinitions="Auto,*" Margin="10,0,10,0">
+                                    <Path Grid.Column="0"
+                                          Data="{StaticResource IconSearch}"
+                                          Width="14"
+                                          Height="14"
+                                          Stretch="Uniform"
+                                          Stroke="{StaticResource HorosTextSecondaryBrush}"
+                                          StrokeThickness="1.5"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,8,0" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding SearchText}"
+                                             PlaceholderText="Profil suchen..."
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             FontSize="12"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True"
+                                             AutomationProperties.Name="Profil suchen" />
+                                </Grid>
+                            </Border>
+
+                            <Button Classes="primary-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding SaveSnapshotCommand}"
+                                    AutomationProperties.Name="Snapshot speichern">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Path Data="{StaticResource IconDatabase}"
+                                          Width="14"
+                                          Height="14"
+                                          Fill="#1A1200"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="Snapshot speichern" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding CreateSystemAbbildCommand}"
+                                    AutomationProperties.Name="System-Abbild erstellen">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Path Data="{StaticResource IconDatabase}"
+                                          Width="14"
+                                          Height="14"
+                                          Stroke="{StaticResource HorosTealBrush}"
+                                          StrokeThickness="1.5"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="System-Abbild erstellen" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding RestoreSnapshotCommand}"
+                                    AutomationProperties.Name="Wiederherstellen">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Path Data="{StaticResource IconRestore}"
+                                          Width="14"
+                                          Height="14"
+                                          Stroke="{StaticResource HorosTealBrush}"
+                                          StrokeThickness="1.5"
+                                          VerticalAlignment="Center" />
+                                    <TextBlock Text="Wiederherstellen" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding BindProgramCommand}"
+                                    AutomationProperties.Name="Programm einbinden">
+                                <TextBlock Text="Programm einbinden" VerticalAlignment="Center" />
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding BindCustomPathsCommand}"
+                                    AutomationProperties.Name="Dateien und Ordner einbinden">
+                                <TextBlock Text="Dateien &amp; Ordner einbinden" VerticalAlignment="Center" />
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding CaptureInventoryCommand}"
+                                    AutomationProperties.Name="Inventar erfassen">
+                                <TextBlock Text="Inventar erfassen" VerticalAlignment="Center" />
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding AutoCreateGroupsCommand}"
+                                    AutomationProperties.Name="Gruppen automatisch erstellen">
+                                <TextBlock Text="Gruppen automatisch erstellen" VerticalAlignment="Center" />
+                            </Button>
+
+                            <Button Classes="outline-action"
+                                    Margin="0,0,8,6"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding EditProfilePathsCommand}"
+                                    AutomationProperties.Name="Pfade bearbeiten">
+                                <TextBlock Text="Pfade bearbeiten" VerticalAlignment="Center" />
+                            </Button>
+                        </WrapPanel>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="0"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,16,0">
+                            <TextBlock Text="{Binding BreadcrumbPrimary}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource HorosTealBrush}" />
+                            <TextBlock Text="{Binding BreadcrumbSecondary}"
+                                       FontSize="13"
+                                       Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Row 2: stat chips -->
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                VerticalAlignment="Center">
+                        <Border Classes="stat-chip">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Path Data="{StaticResource IconGrid}"
+                                      Width="14"
+                                      Height="14"
+                                      Fill="{StaticResource HorosTealBrush}"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ProgramCountLabel}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource HorosTextPrimaryBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="stat-chip">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Path Data="{StaticResource IconSnapshots}"
+                                      Width="14"
+                                      Height="14"
+                                      Fill="{StaticResource HorosTextSecondaryBrush}"
+                                      VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding SnapshotCountLabel}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource HorosTextPrimaryBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="stat-chip">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Path Data="{StaticResource IconClock}"
+                                      Width="14"
+                                      Height="14"
+                                      Stroke="{StaticResource HorosTextSecondaryBrush}"
+                                      StrokeThickness="1.5"
+                                      VerticalAlignment="Center"
+                                      Margin="0,0,4,0" />
+                                <TextBlock Text="{Binding LastSavePrefix}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource HorosTextPrimaryBrush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding LastSaveAccent}"
+                                           FontSize="12"
+                                           Foreground="{StaticResource HorosTealBrush}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

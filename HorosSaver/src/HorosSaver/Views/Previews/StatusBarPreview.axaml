@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:vm="using:HorosSaver.ViewModels.Previews"
+        x:Class="HorosSaver.Views.Previews.StatusBarPreview"
+        x:DataType="vm:StatusBarPreviewViewModel"
+        Title="Preview: StatusBar"
+        Width="1040"
+        Height="48"
+        WindowDecorations="None"
+        CanResize="False"
+        Background="{StaticResource HorosBackgroundBrush}">
+    <Grid Width="1040" Height="48">
+        <regions:StatusBarRegion x:Name="StatusBarRegion"
+                                 DataContext="{Binding}"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch" />
+    </Grid>
+</Window>

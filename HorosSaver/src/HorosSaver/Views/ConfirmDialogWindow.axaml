@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        x:Class="HorosSaver.Views.ConfirmDialogWindow"
+        Width="420"
+        SizeToContent="Height"
+        MinHeight="140"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource HorosBackgroundBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <regions:WindowChromeBar Grid.Row="0"
+                                   ShowMinimizeButton="False"
+                                   ShowMaximizeButton="False" />
+
+        <Border Grid.Row="1" Padding="20" BorderBrush="{StaticResource HorosBorderBrush}" BorderThickness="0,0,0,0">
+        <Grid RowDefinitions="*,Auto,Auto">
+            <TextBlock x:Name="MessageText"
+                       Grid.Row="0"
+                       TextWrapping="Wrap"
+                       FontSize="13"
+                       Margin="0,0,0,16" />
+            <CheckBox x:Name="DeleteSnapshotsCheckBox"
+                      Grid.Row="1"
+                      Content="Zugehörige Snapshots auch löschen"
+                      IsVisible="False"
+                      IsChecked="True"
+                      Margin="0,0,0,16" />
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <Button x:Name="CancelButton"
+                        Content="Abbrechen"
+                        Classes="outline-action"
+                        MinWidth="96"
+                        IsCancel="True"
+                        Click="OnCancelClick" />
+                <Button x:Name="ConfirmButton"
+                        Content="Bestätigen"
+                        Classes="timeline-restore"
+                        MinWidth="96"
+                        IsDefault="True"
+                        Click="OnConfirmClick" />
+            </StackPanel>
+        </Grid>
+        </Border>
+    </Grid>
+</Window>

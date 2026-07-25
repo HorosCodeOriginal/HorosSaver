@@ -1,0 +1,242 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HorosSaver.ViewModels"
+        xmlns:conv="using:HorosSaver.Converters"
+        xmlns:regions="using:HorosSaver.Views.Regions"
+        xmlns:behaviors="using:HorosSaver.Behaviors"
+        x:Class="HorosSaver.Views.BindProgramWizardWindow"
+        x:DataType="vm:BindProgramWizardViewModel"
+        x:Name="Root"
+        Title="Programm einbinden"
+        Width="860"
+        Height="640"
+        MinWidth="720"
+        MinHeight="520"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource HorosBackgroundBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <regions:WindowChromeBar Grid.Row="0" />
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto" Margin="20">
+        <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,16">
+            <TextBlock Text="{Binding StepTitle}" FontSize="20" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding StatusMessage}"
+                       FontSize="12"
+                       Foreground="{StaticResource HorosTextSecondaryBrush}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Panel Grid.Row="1">
+            <Grid IsVisible="{Binding IsDiscoverStep}" RowDefinitions="Auto,Auto,*">
+                <Border Grid.Row="0"
+                        Classes="search-box"
+                        Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="Auto,*" Margin="10,0">
+                        <Path Grid.Column="0"
+                              Data="{StaticResource IconSearch}"
+                              Width="14"
+                              Height="14"
+                              Stretch="Uniform"
+                              Stroke="{StaticResource HorosTextSecondaryBrush}"
+                              StrokeThickness="1.5"
+                              VerticalAlignment="Center"
+                              Margin="0,0,8,0" />
+                        <TextBox x:Name="SearchBox"
+                                 Grid.Column="1"
+                                 Text="{Binding SearchText, Mode=TwoWay}"
+                                 PlaceholderText="Programm suchen…"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 FontSize="12"
+                                 behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True"
+                                 AutomationProperties.Name="Programm suchen" />
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+                    <TextBlock Text="{Binding SelectionSummary}"
+                               FontSize="12"
+                               Foreground="{StaticResource HorosTealBrush}"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Column="1"
+                            Classes="outline-action"
+                            Content="Alle gefilterten auswählen"
+                            Command="{Binding SelectAllFilteredCommand}"
+                            Margin="0,0,8,0"
+                            FontSize="11"
+                            Padding="8,4" />
+                    <Button Grid.Column="2"
+                            Classes="outline-action"
+                            Content="Auswahl aufheben"
+                            Command="{Binding ClearSelectionCommand}"
+                            FontSize="11"
+                            Padding="8,4" />
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Background="{StaticResource HorosPanelBrush}"
+                        BorderBrush="{StaticResource HorosBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="8">
+                    <ScrollViewer x:Name="ProgramsListScroll"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto"
+                                  behaviors:ScrollViewerWheelBehavior.EnableWheelOnHover="True">
+                        <ItemsControl ItemsSource="{Binding Programs}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DiscoveredProgramItemViewModel">
+                                    <Border Padding="10,8"
+                                            CornerRadius="8"
+                                            Margin="0,0,0,4"
+                                            Classes="program-card"
+                                            Classes.program-card-selected="{Binding IsSelected}"
+                                            BorderBrush="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderConverter.Instance}}"
+                                            BorderThickness="{Binding IsSelected, Converter={x:Static conv:BoolToCardBorderThicknessConverter.Instance}}"
+                                            Background="{StaticResource HorosSurfaceBrush}"
+                                            Opacity="{Binding IsAvailable, Converter={x:Static conv:BoolToOpacityConverter.Instance}}">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <CheckBox Grid.Column="0"
+                                                      IsChecked="{Binding IsSelected}"
+                                                      IsEnabled="{Binding IsAvailable}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,10,0" />
+                                            <StackPanel Grid.Column="1" Spacing="2">
+                                                <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="13" />
+                                                <TextBlock FontSize="11" Foreground="{StaticResource HorosTextSecondaryBrush}">
+                                                    <Run Text="{Binding Publisher}" />
+                                                    <Run Text=" · " />
+                                                    <Run Text="{Binding Version}" />
+                                                    <Run Text=" · " />
+                                                    <Run Text="{Binding SourceLabel}" />
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding InstallLocation}"
+                                                           FontSize="10"
+                                                           Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding StatusLabel}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource HorosTealBrush}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="12,0,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <Grid IsVisible="{Binding IsConfigureStep}" RowDefinitions="Auto,Auto,*">
+                <Border Grid.Row="0"
+                        Classes="program-card"
+                        BorderBrush="{StaticResource HorosBorderBrush}"
+                        Margin="0,0,0,12"
+                        Padding="14">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding SelectedProgramSummary}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding PathHint}"
+                                   FontSize="11"
+                                   Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            Margin="0,0,0,8">
+                    <Button Classes="outline-action"
+                            Content="Datei hinzufügen…"
+                            Command="{Binding AddFilePathCommand}" />
+                    <Button Classes="outline-action"
+                            Content="Ordner hinzufügen…"
+                            Command="{Binding AddFolderPathCommand}" />
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="2"
+                              behaviors:ScrollViewerWheelBehavior.EnableWheelOnHover="True">
+                    <ItemsControl ItemsSource="{Binding PathEntries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:BindPathEntryViewModel">
+                                <Border Classes="program-card"
+                                        BorderBrush="{StaticResource HorosBorderBrush}"
+                                        Margin="0,0,0,8"
+                                        Padding="12">
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <TextBox Grid.Row="0" Grid.Column="0"
+                                                 Text="{Binding Label}"
+                                                 PlaceholderText="Bezeichnung"
+                                                 FontSize="12"
+                                                 behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True"
+                                                 Margin="0,0,0,6" />
+                                        <CheckBox Grid.Row="0" Grid.Column="1"
+                                                  Content="Ordner"
+                                                  IsChecked="{Binding IsDirectory}"
+                                                  VerticalAlignment="Center" />
+
+                                        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                 Text="{Binding SourcePath}"
+                                                 PlaceholderText="Quellpfad (z. B. %APPDATA%\…)"
+                                                 FontSize="12"
+                                                 behaviors:TextInputKeyboardBehavior.EnableNavigationKeys="True"
+                                                 Margin="0,0,0,6" />
+
+                                        <StackPanel Grid.Row="2" Grid.Column="0"
+                                                    Orientation="Horizontal"
+                                                    Spacing="8">
+                                            <Button Classes="outline-action"
+                                                    Content="Durchsuchen…"
+                                                    Command="{Binding #Root.((vm:BindProgramWizardViewModel)DataContext).BrowsePathCommand}"
+                                                    CommandParameter="{Binding .}" />
+                                            <TextBlock Text="{Binding ExistsLabel}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource HorosTextSecondaryBrush}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <Button Grid.Row="2" Grid.Column="1"
+                                                Classes="outline-action"
+                                                Content="Entfernen"
+                                                Command="{Binding #Root.((vm:BindProgramWizardViewModel)DataContext).RemovePathCommand}"
+                                                CommandParameter="{Binding .}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Panel>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8"
+                    Margin="0,16,0,0">
+            <Button Classes="outline-action"
+                    Content="Abbrechen"
+                    IsCancel="True"
+                    Command="{Binding CancelCommand}" />
+            <Button Classes="outline-action"
+                    Content="Zurück"
+                    Command="{Binding BackStepCommand}"
+                    IsVisible="{Binding IsConfigureStep}" />
+            <Button Classes="primary-action"
+                    Content="Weiter"
+                    IsDefault="True"
+                    Command="{Binding NextStepCommand}"
+                    IsVisible="{Binding IsDiscoverStep}" />
+            <Button Classes="primary-action"
+                    Content="Einbinden"
+                    IsDefault="True"
+                    Command="{Binding FinishCommand}"
+                    IsVisible="{Binding IsConfigureStep}" />
+        </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,122 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:HorosSaver.ViewModels.Regions"
+             xmlns:models="using:HorosSaver.Models"
+             xmlns:conv="using:HorosSaver.Converters"
+             xmlns:previews="using:HorosSaver.Views.Previews"
+             x:Class="HorosSaver.Views.Regions.SidebarRegion"
+             x:DataType="vm:SidebarRegionViewModel"
+             x:Name="Root"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+    <Design.PreviewWith>
+        <previews:SidebarPreview />
+    </Design.PreviewWith>
+
+    <Border Background="{StaticResource HorosSurfaceBrush}"
+            BorderBrush="{StaticResource HorosBorderBrush}"
+            BorderThickness="0,0,1,0"
+            Width="240"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <DockPanel LastChildFill="True" VerticalAlignment="Stretch">
+            <!-- Footer -->
+            <StackPanel DockPanel.Dock="Bottom" Margin="20,16,20,24" Spacing="8">
+                <Button Classes="outline-action"
+                        HorizontalAlignment="Stretch"
+                        Command="{Binding CreateSystemAbbildCommand}"
+                        AutomationProperties.Name="System-Abbild erstellen">
+                    <TextBlock Text="System-Abbild erstellen"
+                               HorizontalAlignment="Center"
+                               FontSize="12" />
+                </Button>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Border Width="28" Height="28" CornerRadius="14"
+                            Background="#143D38"
+                            BorderBrush="{StaticResource HorosTealBrush}"
+                            BorderThickness="1">
+                        <Path Data="{StaticResource IconCheck}"
+                              Width="12" Height="12"
+                              Stroke="{StaticResource HorosTealBrush}"
+                              StrokeThickness="2"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="HorosSaver 1.0.0"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource HorosTextPrimaryBrush}" />
+                        <TextBlock Text="© 2026 HorosCode GmbH"
+                                   FontSize="10"
+                                   Foreground="{StaticResource HorosTextSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid RowDefinitions="Auto,*" VerticalAlignment="Stretch">
+                <!-- Brand -->
+                <StackPanel Grid.Row="0" Margin="20,24,20,28" Spacing="0">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource HorosTealBrush}">
+                            <TextBlock Text="H"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource HorosBackgroundBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="HorosSaver"
+                                       FontSize="17"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource HorosTextPrimaryBrush}" />
+                            <TextBlock Text="by HorosCode"
+                                       FontSize="11"
+                                       Foreground="{StaticResource HorosTealBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Navigation -->
+                <ItemsControl Grid.Row="1"
+                              ItemsSource="{Binding NavigationItems}"
+                              Margin="12,0,12,0"
+                              VerticalAlignment="Top">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:NavigationItem">
+                            <Button Classes="nav-item"
+                                    Classes.activeNav="{Binding IsActive}"
+                                    Margin="0,2"
+                                    HorizontalAlignment="Stretch"
+                                    Background="{Binding IsActive, Converter={x:Static conv:BoolToNavBackgroundConverter.Instance}}"
+                                    Foreground="{Binding IsActive, Converter={x:Static conv:BoolToNavForegroundConverter.Instance}}"
+                                    Command="{Binding #Root.((vm:SidebarRegionViewModel)DataContext).SelectNavigationCommand}"
+                                    CommandParameter="{Binding Id}"
+                                    AutomationProperties.Name="{Binding Label}">
+                                <Grid ColumnDefinitions="3,*">
+                                    <Border Grid.Column="0"
+                                            Width="3"
+                                            Height="20"
+                                            CornerRadius="2"
+                                            VerticalAlignment="Center"
+                                            Background="{Binding IsActive, Converter={x:Static conv:BoolToNavAccentBarConverter.Instance}}" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="10,0,8,0">
+                                        <Path Width="16" Height="16" VerticalAlignment="Center"
+                                              Fill="{Binding IsActive, Converter={x:Static conv:BoolToNavForegroundConverter.Instance}}"
+                                              Data="{Binding IconKey, Converter={x:Static conv:NavIconKeyToGeometryConverter.Instance}}" />
+                                        <TextBlock Text="{Binding Label}"
+                                                   FontSize="13"
+                                                   FontWeight="{Binding IsActive, Converter={x:Static conv:BoolToNavFontWeightConverter.Instance}}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </DockPanel>
+    </Border>
+</UserControl>
